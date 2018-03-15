@@ -2,23 +2,23 @@ from DataConnection import DataConnection
 
 class IPScope:
 
-    ipScopeTable = "dbo.IPScope"
+    ipScopeTable = "IPScope"
     scopeIDColumn = "ScopeID"
     ipScopeColumn = "IPScope"
     cityIDColumn = "CityID"
 
-    def __init__(self, scopeID, ipScope, cityID):
-            self.scopeID = scopeID
-            self.ipScope = ipScope
-            self.cityID = cityID
+    def __init__(self, scopeID):
+        self.scopeID = scopeID
+        
 
-    def returnAddresses(self, ipScopeColumn, ipScopeTable, scopeIDColumn, returnScopeID):
-        self.queryDatabase(ipScopeColumn, ipScopeTable, scopeIDColumn, returnScopeID)
+    @classmethod
+    def returnAddresses(self, scopeID):
+        addresses = self.selectQuery(self, self.ipScopeColumn, self.scopeIDColumn, scopeID)
+        return addresses
 
+    def selectQuery(self, selectStatement, whereColumn, attributeValue):
+        connection = DataConnection()
 
-    def queryDatabase(self, selectStatement, fromStatement, attributeColumnName, attributeValue):
-        connection = DataConnection
+        query = "SELECT " + selectStatement + " FROM " + self.ipScopeTable + " WHERE " + whereColumn + " = " + attributeValue
 
-        query = "SELECT " + selectStatement + "FROM " + fromStatement + "WHERE " + attributeColumnName + " = " + attributeValue
-
-        connection.runQuery(self, query)
+        connection.runQuery(query)
