@@ -1,4 +1,5 @@
 from DataConnection import DataConnection
+from ipaddress import ip_network
 
 class IPScope:
 
@@ -13,7 +14,8 @@ class IPScope:
 
     @classmethod
     def returnAddresses(self, scopeID):
-        addresses = self.selectQuery(self, self.ipScopeColumn, self.scopeIDColumn, scopeID)
+        scopeAddress = self.selectQuery(self, self.ipScopeColumn, self.scopeIDColumn, scopeID)
+        addresses = self.parseScope(self, scopeAddress)
         return addresses
 
     def selectQuery(self, selectStatement, whereColumn, attributeValue):
@@ -21,4 +23,17 @@ class IPScope:
 
         query = "SELECT " + selectStatement + " FROM " + self.ipScopeTable + " WHERE " + whereColumn + " = " + attributeValue
 
-        connection.runQuery(query)
+        result = connection.runQuery(query)
+        return result.fetchone()[0]
+
+    def parseScope(self, scopeToParse):
+
+        returnList = list()
+
+        listOfAddresses = list(ip_network(scopeToParse).hosts()) 
+        
+        for ip in listOfAddresses:
+            returnList += ip.exploded.split("'")
+            
+        return returnList
+
