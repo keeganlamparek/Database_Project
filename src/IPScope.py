@@ -13,10 +13,32 @@ class IPScope:
         
 
     @classmethod
+    def insertScope(self):
+
+        newScopeID = input("Enter the ID for the new scope: ")
+        newScope = input('Enter the new IP scope: ')
+        newCityID = input('Enter the City ID: ')
+          
+        connection = DataConnection()
+
+        query = "INSERT INTO " + IPScope.ipScopeTable
+
+        query += "(" + IPScope.scopeIDColumn + "," + IPScope.ipScopeColumn + "," + IPScope.cityIDColumn + ")"
+        query += "VALUES(?, ?, ?)"
+        values = [newScopeID, newScope, newCityID]
+
+        connection.updateData(query, values)
+        connection.closeConnection()
+        
+
+
+
+    @classmethod
     def returnAddresses(self, scopeID):
         scopeAddress = self.selectQuery(self, self.ipScopeColumn, self.scopeIDColumn, scopeID)
         addresses = self.parseScope(self, scopeAddress)
         return addresses
+
 
     def selectQuery(self, selectStatement, whereColumn, attributeValue):
         connection = DataConnection()
@@ -25,6 +47,7 @@ class IPScope:
 
         result = connection.runQuery(query)
         return result.fetchone()[0]
+
 
     def parseScope(self, scopeToParse):
 
