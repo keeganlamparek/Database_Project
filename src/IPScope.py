@@ -1,12 +1,13 @@
 from DataConnection import DataConnection
 from ipaddress import ip_network
 
-class IPScope:
+class IPScope():
 
     ipScopeTable = "IPScope"
     scopeIDColumn = "ScopeID"
     ipScopeColumn = "IPScope"
     cityIDColumn = "CityID"
+
 
     def __init__(self, scopeID):
         self.scopeID = scopeID
@@ -30,9 +31,6 @@ class IPScope:
         connection.updateData(query, values)
         connection.closeConnection()
         
-
-
-
     @classmethod
     def returnAddresses(self, scopeID):
         scopeAddress = self.selectQuery(self, self.ipScopeColumn, self.scopeIDColumn, scopeID)
@@ -59,4 +57,38 @@ class IPScope:
             returnList += ip.exploded.split("'")
             
         return returnList
+    
+    @classmethod
+    def deleteScope(self):
+
+        print("What scope would you like to delete?")
+
+        self.displayIPScopeTable(self)
+
+        scopeToDelete = input("Select ScopeID to delete: ")
+
+
+
+    def displayIPScopeTable(self):
+        
+        connection = DataConnection()
+        query = "SELECT * FROM " + self.ipScopeTable 
+
+        allScopes = connection.runQuery(query)
+
+        print("ScopeID ", "    IPScope ", "    CityID")
+        for row in allScopes:
+            print("  ", row.ScopeID, "     ", row.IPScope, "     ", row.CityID)
+
+        connection.closeConnection()
+
+
+        
+           
+
+
+
+
+
+
 

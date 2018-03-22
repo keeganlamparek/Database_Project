@@ -1,3 +1,5 @@
 from IPScope import IPScope
 
-IPScope.insertScope()
+#IPScope.insertScope()
+
+IPScope.deleteScope()
