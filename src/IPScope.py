@@ -50,7 +50,6 @@ class IPScope():
     def parseScope(self, scopeToParse):
 
         returnList = list()
-
         listOfAddresses = list(ip_network(scopeToParse).hosts()) 
         
         for ip in listOfAddresses:
@@ -62,13 +61,18 @@ class IPScope():
     def deleteScope(self):
 
         print("What scope would you like to delete?")
-
         self.displayIPScopeTable(self)
-
         scopeToDelete = input("Select ScopeID to delete: ")
 
+        query = "DELETE FROM " + self.ipScopeTable + " WHERE " + self.scopeIDColumn + " = " + "?"
+        values = [scopeToDelete]
+        connection = DataConnection()
+        connection.updateData(query, values)
+        connection.closeConnection()
 
-
+        print("Deleting...")
+        self.displayIPScopeTable(self)
+        
     def displayIPScopeTable(self):
         
         connection = DataConnection()
