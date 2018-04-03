@@ -8,11 +8,9 @@ class IPScope():
     ipScopeColumn = "IPScope"
     cityIDColumn = "CityID"
 
-
     def __init__(self, scopeID):
         self.scopeID = scopeID
         
-
     @classmethod
     def insertScope(self):
 
@@ -71,6 +69,25 @@ class IPScope():
         connection.closeConnection()
 
         print("Deleting...")
+        self.displayIPScopeTable(self)
+
+    @classmethod
+    def updateScope(self):
+
+        print("What IP scope would you like to update?")
+        self.displayIPScopeTable(self)
+
+        scopeToUpdate = input("Select by ScopeID: ")
+        updatedScope = input("Enter updated scope: ")
+        query = "UPDATE " + self.ipScopeTable + " SET " + self.ipScopeColumn + " = "  + "?" + " WHERE " + self.scopeIDColumn + " = " + "?"
+        
+        print("Updating IP scope...")
+        values = [updatedScope, scopeToUpdate]
+        connection = DataConnection()
+        connection.updateData(query, values)
+        connection.closeConnection
+       
+        print("Values Updated:")
         self.displayIPScopeTable(self)
         
     def displayIPScopeTable(self):

@@ -1,4 +1,4 @@
 from IPScope import IPScope
 
 
-IPScope.deleteScope()
+IPScope.updateScope()
