@@ -1,4 +1,4 @@
-from IPScope import IPScope
 
+startProgram = IPManagerTool()
 
-IPScope.updateScope()
+startProgram.start()
