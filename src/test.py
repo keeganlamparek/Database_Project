@@ -1,4 +1,4 @@
+from IPManagerTool import IPManagerTool
 
-startProgram = IPManagerTool()
-
-startProgram.start()
+program = IPManagerTool()
+program.start()

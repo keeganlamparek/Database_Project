@@ -59,7 +59,7 @@ class IPScope():
     def deleteScope(self):
 
         print("What scope would you like to delete?")
-        self.displayIPScopeTable(self)
+        self.displayIPScopeTable()
         scopeToDelete = input("Select ScopeID to delete: ")
 
         query = "DELETE FROM " + self.ipScopeTable + " WHERE " + self.scopeIDColumn + " = " + "?"
@@ -69,13 +69,13 @@ class IPScope():
         connection.closeConnection()
 
         print("Deleting...")
-        self.displayIPScopeTable(self)
+        self.displayIPScopeTable()
 
     @classmethod
     def updateScope(self):
 
         print("What IP scope would you like to update?")
-        self.displayIPScopeTable(self)
+        self.displayIPScopeTable()
 
         scopeToUpdate = input("Select by ScopeID: ")
         updatedScope = input("Enter updated scope: ")
@@ -88,8 +88,9 @@ class IPScope():
         connection.closeConnection
        
         print("Values Updated:")
-        self.displayIPScopeTable(self)
-        
+        self.displayIPScopeTable()
+
+    @classmethod    
     def displayIPScopeTable(self):
         
         connection = DataConnection()
