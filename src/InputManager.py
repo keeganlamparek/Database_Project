@@ -16,6 +16,10 @@ class InputManager():
 
         elif (caseToHandle == "4"):
             IPScope.deleteScope()
+            
+    ##    elif (caseToHandle == "5"):
+      ##      IPScope.returnAddresses("3")
+
         
 
 

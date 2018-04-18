@@ -18,12 +18,26 @@ class IPScope():
         newScope = input('Enter the new IP scope: ')
         newCityID = input('Enter the City ID: ')
           
+        allAddresses = self.parseScope(self, newScope)
+
         connection = DataConnection()
 
-        query = "INSERT INTO " + IPScope.ipScopeTable
+        query = "BEGIN TRY BEGIN TRAN "
+        query += "INSERT INTO " + IPScope.ipScopeTable
 
         query += "(" + IPScope.scopeIDColumn + "," + IPScope.ipScopeColumn + "," + IPScope.cityIDColumn + ")"
-        query += "VALUES(?, ?, ?)"
+        query += "VALUES(?, ?, ?); "
+        
+        query += "INSERT INTO IPAddress(IPAddress, ScopeID) VALUES"
+
+        for address in allAddresses:
+            query += "('" + address + "', " + newScopeID + "),"
+
+        query = query[:-1]
+        query += ";"
+
+        query += " COMMIT TRAN END TRY BEGIN CATCH ROLLBACK TRAN END CATCH;"
+        
         values = [newScopeID, newScope, newCityID]
 
         connection.updateData(query, values)
@@ -34,7 +48,6 @@ class IPScope():
         scopeAddress = self.selectQuery(self, self.ipScopeColumn, self.scopeIDColumn, scopeID)
         addresses = self.parseScope(self, scopeAddress)
         return addresses
-
 
     def selectQuery(self, selectStatement, whereColumn, attributeValue):
         connection = DataConnection()
