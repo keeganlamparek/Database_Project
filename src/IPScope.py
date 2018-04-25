@@ -1,25 +1,21 @@
 from DataConnection import DataConnection
-from ipaddress import ip_network
+from IPAddress import IPAddress
+from IPTable import IPTable
 
-class IPScope():
+class IPScope(IPTable):
 
     ipScopeTable = "IPScope"
     scopeIDColumn = "ScopeID"
     ipScopeColumn = "IPScope"
     cityIDColumn = "CityID"
-
-    def __init__(self, scopeID):
-        self.scopeID = scopeID
-        
+      
     @classmethod
-    def insertScope(self):
+    def insertScope(cls):
 
         newScopeID = input("Enter the ID for the new scope: ")
         newScope = input('Enter the new IP scope: ')
         newCityID = input('Enter the City ID: ')
           
-        allAddresses = self.parseScope(self, newScope)
-
         connection = DataConnection()
 
         query = "BEGIN TRY BEGIN TRAN "
@@ -27,14 +23,18 @@ class IPScope():
 
         query += "(" + IPScope.scopeIDColumn + "," + IPScope.ipScopeColumn + "," + IPScope.cityIDColumn + ")"
         query += "VALUES(?, ?, ?); "
-        
-        query += "INSERT INTO IPAddress(IPAddress, ScopeID) VALUES"
+    
+        #query += "INSERT INTO IPAddress(IPAddress, ScopeID) VALUES"
 
-        for address in allAddresses:
-            query += "('" + address + "', " + newScopeID + "),"
+        ipAddresses = IPAddress(newScopeID, newScope)
+        query = ipAddresses.insertAddress(query)
 
-        query = query[:-1]
-        query += ";"
+
+      #  for address in allAddresses:
+      #      query += "('" + address + "', " + newScopeID + "),"
+
+      #  query = query[:-1]
+      #  query += ";"
 
         query += " COMMIT TRAN END TRY BEGIN CATCH ROLLBACK TRAN END CATCH;"
         
@@ -44,9 +44,9 @@ class IPScope():
         connection.closeConnection()
         
     @classmethod
-    def returnAddresses(self, scopeID):
-        scopeAddress = self.selectQuery(self, self.ipScopeColumn, self.scopeIDColumn, scopeID)
-        addresses = self.parseScope(self, scopeAddress)
+    def returnAddresses(cls, scopeID):
+        scopeAddress = cls.selectQuery(cls, cls.ipScopeColumn, cls.scopeIDColumn, scopeID)
+        addresses = cls.parseScope(cls, scopeAddress)
         return addresses
 
     def selectQuery(self, selectStatement, whereColumn, attributeValue):
@@ -57,42 +57,31 @@ class IPScope():
         result = connection.runQuery(query)
         return result.fetchone()[0]
 
-
-    def parseScope(self, scopeToParse):
-
-        returnList = list()
-        listOfAddresses = list(ip_network(scopeToParse).hosts()) 
-        
-        for ip in listOfAddresses:
-            returnList += ip.exploded.split("'")
-            
-        return returnList
-    
     @classmethod
-    def deleteScope(self):
+    def deleteScope(cls):
 
         print("What scope would you like to delete?")
-        self.displayIPScopeTable()
+        cls.displayIPScopeTable()
         scopeToDelete = input("Select ScopeID to delete: ")
 
-        query = "DELETE FROM " + self.ipScopeTable + " WHERE " + self.scopeIDColumn + " = " + "?"
+        query = "DELETE FROM " + cls.ipScopeTable + " WHERE " + cls.scopeIDColumn + " = " + "?"
         values = [scopeToDelete]
         connection = DataConnection()
         connection.updateData(query, values)
         connection.closeConnection()
 
         print("Deleting...")
-        self.displayIPScopeTable()
+        cls.displayIPScopeTable()
 
     @classmethod
-    def updateScope(self):
+    def updateScope(cls):
 
         print("What IP scope would you like to update?")
-        self.displayIPScopeTable()
+        cls.displayIPScopeTable()
 
         scopeToUpdate = input("Select by ScopeID: ")
         updatedScope = input("Enter updated scope: ")
-        query = "UPDATE " + self.ipScopeTable + " SET " + self.ipScopeColumn + " = "  + "?" + " WHERE " + self.scopeIDColumn + " = " + "?"
+        query = "UPDATE " + cls.ipScopeTable + " SET " + cls.ipScopeColumn + " = "  + "?" + " WHERE " + cls.scopeIDColumn + " = " + "?"
         
         print("Updating IP scope...")
         values = [updatedScope, scopeToUpdate]
@@ -101,13 +90,13 @@ class IPScope():
         connection.closeConnection
        
         print("Values Updated:")
-        self.displayIPScopeTable()
+        cls.displayIPScopeTable()
 
     @classmethod    
-    def displayIPScopeTable(self):
+    def displayIPScopeTable(cls):
         
         connection = DataConnection()
-        query = "SELECT * FROM " + self.ipScopeTable 
+        query = "SELECT * FROM " + cls.ipScopeTable 
 
         allScopes = connection.runQuery(query)
 

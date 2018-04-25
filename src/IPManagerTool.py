@@ -8,7 +8,7 @@ class IPManagerTool():
         print("Welcome to IP Scope Management Services!")
         print()
         done = False
-        
+
         while(not done):
             
             print("Select an option below:")
