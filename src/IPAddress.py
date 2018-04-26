@@ -3,13 +3,15 @@ from IPTable import IPTable
 
 class IPAddress(IPTable):
 
-    
-    def insertAddress(self, query):
+    ipAddressTable = "IPAddress"
+    scopeIDColumn = "ScopeID"
+
+    def insertAddress(self, query, ipScope):
 
 
         insertInto = "INSERT INTO IPAddress(IPAddress, ScopeID) VALUES"
         query += insertInto
-        allAddresses = self.parseScope(self.ipScope)
+        allAddresses = self.parseScope(ipScope)
 
         overflowCounter = 0
 
@@ -17,18 +19,21 @@ class IPAddress(IPTable):
             
             query += "('" + address + "', " + self.scopeID + "),"
             overflowCounter += 1
-            print(overflowCounter)
             if (overflowCounter >= 1000):
                 query = query[:-1]
                 query += "; "
                 query += insertInto
                 overflowCounter = 0
 
-
         query = query[:-1]
         query += ";"
 
         return query
+
+    def deleteAddresses(self, deleteQuery):
+
+        deleteQuery += "DELETE FROM " + self.ipAddressTable + " WHERE " + self.scopeIDColumn + " = " + "?" + " ;"
+        return deleteQuery
 
     def parseScope(self, scopeToParse):
 
@@ -37,5 +42,7 @@ class IPAddress(IPTable):
         
         for ip in listOfAddresses:
             returnList += ip.exploded.split("'")
+            print(ip)
             
+        
         return returnList

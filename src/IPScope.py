@@ -23,31 +23,18 @@ class IPScope(IPTable):
 
         query += "(" + IPScope.scopeIDColumn + "," + IPScope.ipScopeColumn + "," + IPScope.cityIDColumn + ")"
         query += "VALUES(?, ?, ?); "
-    
-        #query += "INSERT INTO IPAddress(IPAddress, ScopeID) VALUES"
 
-        ipAddresses = IPAddress(newScopeID, newScope)
-        query = ipAddresses.insertAddress(query)
-
-
-      #  for address in allAddresses:
-      #      query += "('" + address + "', " + newScopeID + "),"
-
-      #  query = query[:-1]
-      #  query += ";"
+        ipAddresses = IPAddress(newScopeID)
+        query = ipAddresses.insertAddress(query, newScope)
 
         query += " COMMIT TRAN END TRY BEGIN CATCH ROLLBACK TRAN END CATCH;"
         
         values = [newScopeID, newScope, newCityID]
-
+        print(query)
         connection.updateData(query, values)
         connection.closeConnection()
         
-    @classmethod
-    def returnAddresses(cls, scopeID):
-        scopeAddress = cls.selectQuery(cls, cls.ipScopeColumn, cls.scopeIDColumn, scopeID)
-        addresses = cls.parseScope(cls, scopeAddress)
-        return addresses
+
 
     def selectQuery(self, selectStatement, whereColumn, attributeValue):
         connection = DataConnection()
@@ -57,21 +44,22 @@ class IPScope(IPTable):
         result = connection.runQuery(query)
         return result.fetchone()[0]
 
-    @classmethod
-    def deleteScope(cls):
+    def deleteScope(self, scopeID):
+      
+        query = "BEGIN TRY BEGIN TRAN "
+        ipAddress = IPAddress(scopeID)
+        query = ipAddress.deleteAddresses(query)
+        query += "DELETE FROM " + self.ipScopeTable + " WHERE " + self.scopeIDColumn + " = " + "?" + " ; "
 
-        print("What scope would you like to delete?")
-        cls.displayIPScopeTable()
-        scopeToDelete = input("Select ScopeID to delete: ")
+        query += " COMMIT TRAN END TRY BEGIN CATCH ROLLBACK TRAN END CATCH;"
 
-        query = "DELETE FROM " + cls.ipScopeTable + " WHERE " + cls.scopeIDColumn + " = " + "?"
-        values = [scopeToDelete]
+        values = [scopeID, scopeID]
+
         connection = DataConnection()
         connection.updateData(query, values)
         connection.closeConnection()
 
         print("Deleting...")
-        cls.displayIPScopeTable()
 
     @classmethod
     def updateScope(cls):

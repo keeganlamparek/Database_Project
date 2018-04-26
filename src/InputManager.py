@@ -15,10 +15,14 @@ class InputManager():
             IPScope.updateScope()
 
         elif (caseToHandle == "4"):
-            IPScope.deleteScope()
-            
-    ##    elif (caseToHandle == "5"):
-      ##      IPScope.returnAddresses("3")
+            IPScope.displayIPScopeTable()
+
+            scopeToDelete = input("Select ScopeID to delete: ")
+
+            ipScope = IPScope(scopeToDelete)
+            ipScope.displayIPScopeTable()
+            ipScope.deleteScope(scopeToDelete)
+
 
         
 
