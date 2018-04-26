@@ -9,7 +9,7 @@ class IPManagerTool():
 
     @classmethod
     def start(cls):
-        
+
         print("Welcome to IP Scope Management Services!")
         print()
         done = False
@@ -26,10 +26,12 @@ class IPManagerTool():
 
             if(caseToUse == "1"):
                 InputManager.handleInput(cls.addressManager)
-            elif(caseToUse == )
-            if(caseToUse == "q"):
+
+            elif(caseToUse == "2"):
+                InputManager.handleInput(cls.scopeManager)
+
+            elif(caseToUse == "q"):
                 done = True
                 print("Quitting program...")
-            else:
-                InputManager.handleInput(caseToUse)
+
             print()

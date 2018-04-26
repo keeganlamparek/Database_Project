@@ -1,8 +1,6 @@
-
 from IPTable import IPTable
-class InputManager():
 
-    
+class InputManager():
 
     @classmethod
     def handleInput(cls, manager):
