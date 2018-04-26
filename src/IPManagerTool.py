@@ -1,7 +1,12 @@
+from IPAddress import IPAddress
+from IPScope import IPScope
 from InputManager import InputManager
 
 class IPManagerTool():
     
+    addressManager = IPAddress()
+    scopeManager = IPScope()
+
     @classmethod
     def start(cls):
         
@@ -11,15 +16,17 @@ class IPManagerTool():
 
         while(not done):
             
+            print("Do you want to manage IP addresses or IP scopes?")
             print("Select an option below:")
-            print("1: Display all IP scopes")
-            print("2: Insert new scope")
-            print("3: Update scope")
-            print("4: Delete a scope")
+            print("1: IP Addresses")
+            print("2: IP Scope")
             print("Type q to quit this program")
 
             caseToUse = input("Select a number: ")
 
+            if(caseToUse == "1"):
+                InputManager.handleInput(cls.addressManager)
+            elif(caseToUse == )
             if(caseToUse == "q"):
                 done = True
                 print("Quitting program...")

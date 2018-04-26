@@ -9,6 +9,9 @@ class IPScope(IPTable):
     ipScopeColumn = "IPScope"
     cityIDColumn = "CityID"
       
+    def askForInput():
+        print("Testing")
+    
     @classmethod
     def insertScope(cls):
 
@@ -24,18 +27,16 @@ class IPScope(IPTable):
         query += "(" + IPScope.scopeIDColumn + "," + IPScope.ipScopeColumn + "," + IPScope.cityIDColumn + ")"
         query += "VALUES(?, ?, ?); "
 
-        ipAddresses = IPAddress(newScopeID)
-        query = ipAddresses.insertAddress(query, newScope)
+        ipAddresses = IPAddress()
+        query += ipAddresses.insertAddress(newScope, newScopeID)
 
         query += " COMMIT TRAN END TRY BEGIN CATCH ROLLBACK TRAN END CATCH;"
         
         values = [newScopeID, newScope, newCityID]
-        print(query)
+     
         connection.updateData(query, values)
         connection.closeConnection()
         
-
-
     def selectQuery(self, selectStatement, whereColumn, attributeValue):
         connection = DataConnection()
 

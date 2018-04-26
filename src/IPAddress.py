@@ -6,18 +6,22 @@ class IPAddress(IPTable):
     ipAddressTable = "IPAddress"
     scopeIDColumn = "ScopeID"
 
-    def insertAddress(self, query, ipScope):
+
+    def askForInput():
+        print("testing")
+
+    def insertAddress(self, ipScope, scopeID):
 
 
-        insertInto = "INSERT INTO IPAddress(IPAddress, ScopeID) VALUES"
-        query += insertInto
+        insertInto = " INSERT INTO IPAddress(IPAddress, ScopeID) VALUES"
+        query = insertInto
         allAddresses = self.parseScope(ipScope)
 
         overflowCounter = 0
 
         for address in allAddresses:
             
-            query += "('" + address + "', " + self.scopeID + "),"
+            query += "('" + address + "', " + scopeID + "),"
             overflowCounter += 1
             if (overflowCounter >= 1000):
                 query = query[:-1]
