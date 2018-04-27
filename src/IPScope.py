@@ -1,11 +1,11 @@
 from DataConnection import DataConnection
 from IPAddress import IPAddress
 from IPTable import IPTable
+import socket
 
 class IPScope(IPTable):
 
-    ipScopeTable = "IPScope"
-    scopeIDColumn = "ScopeID"
+    ipScopeTable = "IPScopeTable"
     ipScopeColumn = "IPScope"
     cityIDColumn = "CityID"
       
@@ -47,27 +47,36 @@ class IPScope(IPTable):
     def insertScope(cls):
 
         newScopeID = input("Enter the ID for the new scope: ")
-        print("Scopes lower than a /21 don't work at this moment.")
+        print("Scopes with a slash lower than a.b.c.d/21 don't work at this moment.")
         newScope = input('Enter the new IP scope: ')
         newCityID = input('Enter the City ID: ')
-          
-        connection = DataConnection()
 
-        query = "BEGIN TRY BEGIN TRAN "
-        query += "INSERT INTO " + IPScope.ipScopeTable
 
-        query += "(" + IPScope.scopeIDColumn + "," + IPScope.ipScopeColumn + "," + IPScope.cityIDColumn + ")"
-        query += "VALUES(?, ?, ?); "
+        if(cls.is_a_valid_ip_address(cls, newScope)):
+            connection = DataConnection()
 
-        ipAddresses = IPAddress()
-        query += ipAddresses.insertAddress(newScope, newScopeID)
+            query = "BEGIN TRY BEGIN TRAN "
+            query += "INSERT INTO " + cls.ipScopeTable
 
-        query += " COMMIT TRAN END TRY BEGIN CATCH ROLLBACK TRAN END CATCH;"
+            query += "(" + cls.scopeIDColumn + "," + cls.ipScopeColumn + "," + cls.cityIDColumn + ")"
+            query += "VALUES(?, ?, ?); "
+
+            ipAddress = IPAddress()
+            query += ipAddress.insertAddress(newScope, newScopeID)
+
+            query += " COMMIT TRAN END TRY BEGIN CATCH ROLLBACK TRAN END CATCH;"
+            
+            values = [newScopeID, newScope, newCityID]
         
-        values = [newScopeID, newScope, newCityID]
-     
-        connection.updateData(query, values)
-        connection.closeConnection()
+            connection.updateData(query, values)
+            connection.closeConnection()
+        else:
+            
+            print()
+            print("Please type a valid address!")
+            print()
+            #Program will keep asking until valid IP scope is entered
+            cls.insertScope()  
 
     def deleteScope(self):
       
@@ -76,12 +85,12 @@ class IPScope(IPTable):
 
         query = "BEGIN TRY BEGIN TRAN "
         ipAddress = IPAddress()
-        query = ipAddress.deleteAddresses(query)
+        query += ipAddress.deleteAddresses()
         query += "DELETE FROM " + self.ipScopeTable + " WHERE " + self.scopeIDColumn + " = " + "?" + " ; "
 
         query += " COMMIT TRAN END TRY BEGIN CATCH ROLLBACK TRAN END CATCH;"
 
-        values = [scopeID, scopeID]
+        values = [scopeID, scopeID]  #2nd scopeID comes from ipAddress.deleteAddresses()
 
         connection = DataConnection()
         connection.updateData(query, values)
@@ -97,22 +106,36 @@ class IPScope(IPTable):
 
         scopeToUpdate = input("Select by ScopeID: ")
         updatedScope = input("Enter updated scope: ")
-        query = "UPDATE " + cls.ipScopeTable + " SET " + cls.ipScopeColumn + " = "  + "?" + " WHERE " + cls.scopeIDColumn + " = " + "?"
+
+        if(cls.is_a_valid_ip_address(cls, updatedScope)):
+            query = "UPDATE " + cls.ipScopeTable + " SET " + cls.ipScopeColumn + " = "  + "?" + " WHERE " + cls.scopeIDColumn + " = " + "?" + "; "
+            
+            ipAddress = IPAddress()
+            query += ipAddress.deleteAddresses()
+
+            query += ipAddress.insertAddress(updatedScope, scopeToUpdate)
+
+            print("Updating IP scope...")
+            values = [updatedScope, scopeToUpdate, scopeToUpdate] # 3rd value and ? is located from the ipAddress.deleteAddress()
+            connection = DataConnection()
+            connection.updateData(query, values)
+            connection.closeConnection
         
-        print("Updating IP scope...")
-        values = [updatedScope, scopeToUpdate]
-        connection = DataConnection()
-        connection.updateData(query, values)
-        connection.closeConnection
-       
-        print("Values Updated:")
-        cls.displayIPScopeTable()
+            print("Values Updated:")
+            cls.displayIPScopeTable()
+
+        else:
+            print()
+            print("Please type a valid address!")
+            print()
+            #Program will keep asking until valid IP scope is entered
+            cls.updateScope() 
 
     @classmethod    
     def displayIPScopeTable(cls):
-        
+
         connection = DataConnection()
-        query = "SELECT * FROM " + cls.ipScopeTable 
+        query = "SELECT " + cls.scopeIDColumn + ", " + cls.ipScopeColumn + ", " + cls.cityIDColumn + " FROM " + cls.ipScopeTable 
 
         allScopes = connection.runQuery(query)
 
@@ -122,13 +145,14 @@ class IPScope(IPTable):
 
         connection.closeConnection()
 
+    def is_a_valid_ip_address(self, address):
 
-        
-           
+        address = address[:-3] #delete the slash notation from the scope Ex: 10.0.0.0/21 --> 10.0.0.0
 
+        try:
+            socket.inet_pton(socket.AF_INET, address)
 
+        except socket.error:  # not a valid address
+            return False
 
-
-
-
-
+        return True

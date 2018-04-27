@@ -2,10 +2,10 @@ from ipaddress import ip_network
 from IPTable import IPTable
 from DataConnection import DataConnection
 
+
 class IPAddress(IPTable):
 
-    ipAddressTable = "IPAddress"
-    scopeIDColumn = "ScopeID"
+    ipAddressTable = "IPAddressTable"
     ipAddressColumn = "IPAddress"
 
     def askForInput(self):
@@ -26,32 +26,38 @@ class IPAddress(IPTable):
 
         address = input("Enter IP address: ")
 
-        query = "SELECT " + self.scopeIDColumn + " FROM " + self.ipAddressTable + " WHERE " + self.ipAddressColumn + " = " + address
-
         try:
+            selectFromIPAddressTableQuery = "SELECT " + self.scopeIDColumn + " FROM " + self.ipAddressTable + " WHERE " + self.ipAddressColumn + " = '" + address + "'"
+            result = connection.runQuery(selectFromIPAddressTableQuery)
+            row = result.fetchone()
+            scopeID = row.ScopeID
+            
+            query = "SELECT " + " IPScope " + " FROM " + "IPScopeTable" + " WHERE " + self.scopeIDColumn + " = " + str(scopeID)
             result = connection.runQuery(query)
-            print(result)
+            row = result.fetchone()
+            associatedScope = row.IPScope
+
+            print("The associated scope is: " + associatedScope)
+
+            connection.closeConnection()
 
         except:
             print("Not a valid address or address does not exits")
 
-
-        
-
-
     def insertAddress(self, ipScope, scopeID):
 
-        insertInto = " INSERT INTO IPAddress(IPAddress, ScopeID) VALUES"
+        insertInto = " INSERT INTO "+ self.ipAddressTable + " (IPAddress, ScopeID) VALUES"
         query = insertInto
         allAddresses = self.parseScope(ipScope)
 
+        sqlInsertLimitation = 1000
         overflowCounter = 0
 
         for address in allAddresses:
             
             query += "('" + address + "', " + scopeID + "),"
             overflowCounter += 1
-            if (overflowCounter >= 1000):
+            if (overflowCounter >= sqlInsertLimitation):
                 query = query[:-1]
                 query += "; "
                 query += insertInto
@@ -62,18 +68,17 @@ class IPAddress(IPTable):
 
         return query
 
-    def deleteAddresses(self, deleteQuery):
+    def deleteAddresses(self):
 
-        deleteQuery += "DELETE FROM " + self.ipAddressTable + " WHERE " + self.scopeIDColumn + " = " + "?" + " ;"
+        deleteQuery = " DELETE FROM " + self.ipAddressTable + " WHERE " + self.scopeIDColumn + " = " + "?" + " ;"
         return deleteQuery
 
     def parseScope(self, scopeToParse):
 
         returnList = list()
-        listOfAddresses = list(ip_network(scopeToParse).hosts()) 
+        listOfAddresses = list(ip_network(scopeToParse).hosts()) # returns a list of IP addresses
         
         for ip in listOfAddresses:
             returnList += ip.exploded.split("'")
             
-
         return returnList
